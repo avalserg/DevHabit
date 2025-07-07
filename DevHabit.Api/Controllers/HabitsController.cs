@@ -1,4 +1,5 @@
-﻿using DevHabit.Api.Database;
+﻿using System.Linq.Expressions;
+using DevHabit.Api.Database;
 using DevHabit.Api.DTOs.Habits;
 using DevHabit.Api.Entities;
 using FluentValidation;
@@ -17,6 +18,15 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
     {
         query.Search ??= query.Search?.Trim().ToLower();
 
+        Expression<Func<Habit, object>> orderBy = query.Sort switch
+        {
+            "name" => h => h.Name,
+            "description" => h => h.Description,
+            "type" => h => h.Type,
+            "status" => h => h.Status,
+            _ => h => h.Name,
+        };
+
         List<HabitDto> habits = await dbContext
             .Habits
             .Where(h => query.Search == null ||
@@ -24,6 +34,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext) : Controlle
                         h.Description != null && h.Description.ToLower().Contains(query.Search.ToLower()))
             .Where(h => query.Type == null || h.Type == query.Type)
             .Where(h => query.Status == null || h.Status == query.Status)
+            .OrderBy(orderBy)
             .Select(HabitQueries.ProjectToDto())
             .ToListAsync();
 
