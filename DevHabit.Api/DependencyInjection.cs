@@ -2,8 +2,8 @@
 using DevHabit.Api.DTOs.Habits;
 using DevHabit.Api.Entities;
 using DevHabit.Api.Middleware;
-using DevHabit.Api.Services.Sorting;
 using DevHabit.Api.Services;
+using DevHabit.Api.Services.Sorting;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -93,6 +93,10 @@ public static class DependencyInjection
             HabitMappings.SortMapping);
 
         builder.Services.AddTransient<DataShapingService>();
+
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddTransient<LinkService>();
 
         return builder;
     }
