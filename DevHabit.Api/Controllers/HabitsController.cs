@@ -15,9 +15,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
 [ApiController]
-[Route("v{version:apiVersion}/habits")]
+[Route("habits")]
 [ApiVersion(1.0)]
-[ApiVersion(2.0)]
 public sealed class HabitsController(ApplicationDbContext dbContext, LinkService linkService) : ControllerBase
 {
     [HttpGet]
@@ -129,7 +128,7 @@ public sealed class HabitsController(ApplicationDbContext dbContext, LinkService
     }
 
     [HttpGet("{id}")]
-    [MapToApiVersion(2.0)]
+    [ApiVersion(2.0)]
     public async Task<ActionResult<HabitWithTagsDtoV2>> GetHabitV2(
         string id,
         string? fields,
