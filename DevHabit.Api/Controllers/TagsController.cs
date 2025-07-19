@@ -6,12 +6,14 @@ using DevHabit.Api.Entities;
 using DevHabit.Api.Services;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("tags")]
 [Produces(
@@ -69,7 +71,6 @@ public sealed class TagsController(ApplicationDbContext dbContext, LinkService l
     [HttpPost]
     public async Task<ActionResult<TagDto>> CreateTag(
         CreateTagDto createTagDto,
-        [FromHeader] AcceptHeaderDto acceptHeader,
         IValidator<CreateTagDto> validator,
         ProblemDetailsFactory problemDetailsFactory)
     {
