@@ -1,6 +1,7 @@
 ﻿using DevHabit.Api.Database;
 using DevHabit.Api.DTOs.Tags;
 using DevHabit.Api.DTOs.Users;
+using DevHabit.Api.Entities;
 using DevHabit.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
 
-[Authorize]
+[Authorize(Roles = $"{Roles.Admin},{Roles.Member}")]
 [ApiController]
 [Route("users")]
 public sealed class UsersController(ApplicationDbContext dbContext, UserContext userContext) : ControllerBase
