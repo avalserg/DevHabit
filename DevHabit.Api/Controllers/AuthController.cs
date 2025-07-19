@@ -110,7 +110,7 @@ public sealed class AuthController(
 
         return Ok(accessTokens);
     }
-    //TODO Best way chain tokens with parent
+
     [HttpPost("refresh")]
     public async Task<ActionResult<AccessTokensDto>> Refresh(RefreshTokenDto refreshTokenDto)
     {
