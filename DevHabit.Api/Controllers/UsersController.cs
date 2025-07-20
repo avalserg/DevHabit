@@ -9,12 +9,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
 
-[Authorize(Roles = $"{Roles.Admin},{Roles.Member}")]
+[Authorize(Roles = $"{Roles.Member}")]
 [ApiController]
 [Route("users")]
 public sealed class UsersController(ApplicationDbContext dbContext, UserContext userContext) : ControllerBase
 {
     [HttpGet("{id}")]
+    [Authorize(Roles = $"{Roles.Admin}")]
     public async Task<ActionResult<TagDto>> GetUserById(string id)
     {
         string? userId = await userContext.GetUserIdAsync();
