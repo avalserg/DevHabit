@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Services;
 
-public sealed class GitHubAccessTokenService(ApplicationDbContext dbContext)
+public sealed class GitHubAccessTokenService(ApplicationDbContext dbContext, EncryptionService encryptionService)
 {
     public async Task StoreAsync(
         string userId,
@@ -13,9 +13,12 @@ public sealed class GitHubAccessTokenService(ApplicationDbContext dbContext)
         CancellationToken cancellationToken = default)
     {
         GitHubAccessToken? existingAccessToken = await GetAccessTokenAsync(userId, cancellationToken);
+
+        string encryptedToken = encryptionService.Encrypt(accessTokenDto.AccessToken);
+
         if (existingAccessToken is not null)
         {
-            existingAccessToken.Token = accessTokenDto.AccessToken;
+            existingAccessToken.Token = encryptedToken;
             existingAccessToken.ExpiresAtUtc = DateTime.UtcNow.AddDays(accessTokenDto.ExpiresInDays);
         }
         else
@@ -24,7 +27,7 @@ public sealed class GitHubAccessTokenService(ApplicationDbContext dbContext)
             {
                 Id = $"gh_{Guid.CreateVersion7()}",
                 UserId = userId,
-                Token = accessTokenDto.AccessToken,
+                Token = encryptedToken,
                 CreatedAtUtc = DateTime.UtcNow,
                 ExpiresAtUtc = DateTime.UtcNow.AddDays(accessTokenDto.ExpiresInDays)
             });
@@ -36,7 +39,15 @@ public sealed class GitHubAccessTokenService(ApplicationDbContext dbContext)
     public async Task<string?> GetAsync(string userId, CancellationToken cancellationToken = default)
     {
         GitHubAccessToken? gitHubAccessToken = await GetAccessTokenAsync(userId, cancellationToken);
-        return gitHubAccessToken?.Token;
+
+        if (gitHubAccessToken is null)
+        {
+            return null;
+        }
+
+        string decryptedToken = encryptionService.Decrypt(gitHubAccessToken.Token);
+
+        return decryptedToken;
     }
 
     public async Task RevokeAsync(string userId, CancellationToken cancellationToken = default)
